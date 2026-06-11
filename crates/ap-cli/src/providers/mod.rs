@@ -5,12 +5,14 @@
 
 mod bitwarden;
 mod example;
+mod proton;
 
 use ap_client::CredentialData;
 pub use ap_client::CredentialQuery;
 pub use bitwarden::BitwardenProvider;
 use color_eyre::eyre::{Result, bail};
 pub use example::ExampleProvider;
+pub use proton::ProtonProvider;
 
 /// Current readiness of a credential provider.
 #[derive(Debug)]
@@ -67,8 +69,9 @@ pub trait CredentialProvider: Send + Sync {
 pub fn create_provider(name: &str) -> Result<Box<dyn CredentialProvider>> {
     match name {
         "bitwarden" => Ok(Box::new(BitwardenProvider::new())),
+        "proton" => Ok(Box::new(ProtonProvider::new())),
         "example" => Ok(Box::new(ExampleProvider::new())),
-        _ => bail!("Unknown credential provider: '{name}'. Available: bitwarden, example"),
+        _ => bail!("Unknown credential provider: '{name}'. Available: bitwarden, proton, example"),
     }
 }
 
@@ -150,6 +153,12 @@ mod tests {
     fn create_provider_bitwarden() {
         let provider = create_provider("bitwarden").expect("should create bitwarden provider");
         assert_eq!(provider.name(), "Bitwarden");
+    }
+
+    #[test]
+    fn create_provider_proton() {
+        let provider = create_provider("proton").expect("should create proton provider");
+        assert_eq!(provider.name(), "Proton Pass");
     }
 
     #[test]
